@@ -109,6 +109,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
 
   /**
+   * 设置类扫描的过滤器
    * Configures parent scanner to search for the right interfaces. It can search
    * for all interfaces or just for those that extends a markerInterface or/and
    * those annotated with the annotationClass
@@ -146,6 +147,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
   }
 
   /**
+   * 类扫描注册 BeanDefinition
    * Calls the parent search that will search and register all the candidates.
    * Then the registered objects are post processed to set them as
    * MapperFactoryBeans
@@ -164,6 +166,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
   }
 
   private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
+    // 实际上这里注册的是 Mapper 接口，使用的是 FactoryBean  MapperFactoryBean
     GenericBeanDefinition definition;
     for (BeanDefinitionHolder holder : beanDefinitions) {
       definition = (GenericBeanDefinition) holder.getBeanDefinition();
@@ -174,10 +177,12 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
       definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
+      // 这里设置 FactoryBean
       definition.setBeanClass(this.mapperFactoryBean.getClass());
 
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
 
+      // 下面就是设置 SqlSessionFactory 的依赖，通常没有，使用默认的
       boolean explicitFactoryUsed = false;
       if (StringUtils.hasText(this.sqlSessionFactoryBeanName)) {
         definition.getPropertyValues().add("sqlSessionFactory", new RuntimeBeanReference(this.sqlSessionFactoryBeanName));
@@ -201,6 +206,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         explicitFactoryUsed = true;
       }
 
+      // 如果没有明确指定 SqlSessionFactory ，那就自动依赖
       if (!explicitFactoryUsed) {
         LOGGER.debug(() -> "Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName() + "'.");
         definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);

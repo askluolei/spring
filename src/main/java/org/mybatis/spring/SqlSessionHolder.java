@@ -23,6 +23,7 @@ import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.transaction.support.ResourceHolderSupport;
 
 /**
+ * 重点是继承了 ResourceHolderSupport
  * Used to keep current {@code SqlSession} in {@code TransactionSynchronizationManager}.
  * The {@code SqlSessionFactory} that created that {@code SqlSession} is used as a key.
  * {@code ExecutorType} is also kept to be able to check if the user is trying to change it

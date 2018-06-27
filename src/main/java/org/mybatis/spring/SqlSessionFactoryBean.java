@@ -421,6 +421,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
     Configuration configuration;
 
     XMLConfigBuilder xmlConfigBuilder = null;
+    // 如果自定义了 Configuration，那就用自定义的
     if (this.configuration != null) {
       configuration = this.configuration;
       if (configuration.getVariables() == null) {
@@ -429,28 +430,37 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
         configuration.getVariables().putAll(this.configurationProperties);
       }
     } else if (this.configLocation != null) {
+      // 如果配置了文件路径（配置文件）,就根据路径创建 Configuration
       xmlConfigBuilder = new XMLConfigBuilder(this.configLocation.getInputStream(), null, this.configurationProperties);
       configuration = xmlConfigBuilder.getConfiguration();
     } else {
+      // 否则，就用默认的
       LOGGER.debug(() -> "Property 'configuration' or 'configLocation' not specified, using default MyBatis Configuration");
       configuration = new Configuration();
+      // 设置属性
       if (this.configurationProperties != null) {
         configuration.setVariables(this.configurationProperties);
       }
     }
 
+    // 下面就是自定义 Configuration 里面的配置了
+
+    // 对象工厂 返回值对象创建工厂，一般不会改这里
     if (this.objectFactory != null) {
       configuration.setObjectFactory(this.objectFactory);
     }
 
+    // 这里一般也不会动
     if (this.objectWrapperFactory != null) {
       configuration.setObjectWrapperFactory(this.objectWrapperFactory);
     }
 
+    // 这个可能会动，在不同的容器里面找资源的方式不同
     if (this.vfs != null) {
       configuration.setVfsImpl(this.vfs);
     }
 
+    // 别名，指定包
     if (hasLength(this.typeAliasesPackage)) {
       String[] typeAliasPackageArray = tokenizeToStringArray(this.typeAliasesPackage,
           ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
@@ -461,6 +471,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       }
     }
 
+    // 别名，直接指明 class
     if (!isEmpty(this.typeAliases)) {
       for (Class<?> typeAlias : this.typeAliases) {
         configuration.getTypeAliasRegistry().registerAlias(typeAlias);
@@ -468,6 +479,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       }
     }
 
+    // 插件扩展
     if (!isEmpty(this.plugins)) {
       for (Interceptor plugin : this.plugins) {
         configuration.addInterceptor(plugin);
@@ -475,6 +487,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       }
     }
 
+    // 自定义类型处理（java 类型到 sql 类型），包扫描
     if (hasLength(this.typeHandlersPackage)) {
       String[] typeHandlersPackageArray = tokenizeToStringArray(this.typeHandlersPackage,
           ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
@@ -484,6 +497,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       }
     }
 
+    // 自定义类型处理（java 类型到 sql 类型），class
     if (!isEmpty(this.typeHandlers)) {
       for (TypeHandler<?> typeHandler : this.typeHandlers) {
         configuration.getTypeHandlerRegistry().register(typeHandler);
@@ -491,6 +505,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       }
     }
 
+    // 数据库标识
     if (this.databaseIdProvider != null) {//fix #64 set databaseId before parse mapper xmls
       try {
         configuration.setDatabaseId(this.databaseIdProvider.getDatabaseId(this.dataSource));
@@ -499,12 +514,14 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       }
     }
 
+    // 缓存
     if (this.cache != null) {
       configuration.addCache(this.cache);
     }
 
     if (xmlConfigBuilder != null) {
       try {
+        // 如果需要解析（自定义配置文件路径）,就开始解析
         xmlConfigBuilder.parse();
         LOGGER.debug(() -> "Parsed configuration file: '" + this.configLocation + "'");
       } catch (Exception ex) {
@@ -514,12 +531,15 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       }
     }
 
+    // 设置事务工厂，通常不会用这个的。
     if (this.transactionFactory == null) {
       this.transactionFactory = new SpringManagedTransactionFactory();
     }
 
+    // 设置环境（数据源和事务工厂）
     configuration.setEnvironment(new Environment(this.environment, this.transactionFactory, this.dataSource));
 
+    // mapper 文件路径
     if (!isEmpty(this.mapperLocations)) {
       for (Resource mapperLocation : this.mapperLocations) {
         if (mapperLocation == null) {
@@ -541,6 +561,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
       LOGGER.debug(() -> "Property 'mapperLocations' was not specified or no matching resources found");
     }
 
+    // 构造 SqlSessionFactory
     return this.sqlSessionFactoryBuilder.build(configuration);
   }
 

@@ -27,6 +27,7 @@ import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.transaction.TransactionException;
 
 /**
+ * mybatis 的异常处理
  * Default exception translator.
  *
  * Translates MyBatis SqlSession returned exception into a Spring
@@ -62,6 +63,7 @@ public class MyBatisExceptionTranslator implements PersistenceExceptionTranslato
    */
   @Override
   public DataAccessException translateExceptionIfPossible(RuntimeException e) {
+    // 处理 mybatis 的数据库操作异常，转换为spring 体系里面的异常
     if (e instanceof PersistenceException) {
       // Batch exceptions come inside another PersistenceException
       // recursion has a risk of infinite loop so better make another if

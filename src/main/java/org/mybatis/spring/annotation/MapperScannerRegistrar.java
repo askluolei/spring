@@ -73,7 +73,7 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
   }
 
   void registerBeanDefinitions(AnnotationAttributes annoAttrs, BeanDefinitionRegistry registry) {
-
+    // 这里就是一个类扫描，下面全是定义规则
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
 
     // this check is needed in Spring 3.1
@@ -121,6 +121,8 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
             .collect(Collectors.toList()));
 
     scanner.registerFilters();
+
+    // 这里开始扫描，注册 BeanDefinition (Mapper 接口)
     scanner.doScan(StringUtils.toStringArray(basePackages));
   }
 

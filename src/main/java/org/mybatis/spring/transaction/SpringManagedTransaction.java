@@ -30,6 +30,8 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
+ * 事务管理
+ * 重点在于 获取连接 和 释放连接 调用 DataSourceUtils 的方法，这样就可以将事务托管给 spring了？
  * {@code SpringManagedTransaction} handles the lifecycle of a JDBC connection.
  * It retrieves a connection from Spring's transaction manager and returns it back to it
  * when it is no longer needed.

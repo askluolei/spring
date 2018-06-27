@@ -25,6 +25,7 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
+ * 使用 spring 的事务时候用的 事务管理工程
  * Creates a {@code SpringManagedTransaction}.
  *
  * @author Hunter Presnall

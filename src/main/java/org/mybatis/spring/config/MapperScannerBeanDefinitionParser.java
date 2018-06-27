@@ -51,6 +51,7 @@ public class MapperScannerBeanDefinitionParser implements BeanDefinitionParser {
   private static final String ATTRIBUTE_FACTORY_REF = "factory-ref";
 
   /**
+   * xml 解析流程
    * {@inheritDoc}
    */
   @Override

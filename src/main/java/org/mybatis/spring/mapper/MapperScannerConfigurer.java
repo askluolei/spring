@@ -303,7 +303,7 @@ public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProces
     if (this.processPropertyPlaceHolders) {
       processPropertyPlaceHolders();
     }
-
+    // 通过 BeanDefinitionRegistryPostProcessor 扩展
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
     scanner.setAddToConfig(this.addToConfig);
     scanner.setAnnotationClass(this.annotationClass);
